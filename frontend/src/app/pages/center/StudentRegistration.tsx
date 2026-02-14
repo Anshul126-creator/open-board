@@ -60,24 +60,24 @@ export function StudentRegistration() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-3xl tracking-tight">Student Registration</h2>
           <p className="text-muted-foreground">Register new students at your center</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button className="w-full md:w-auto">
+              <Plus className="mr-2 h-4 w-4" />
               Register Student
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Register New Student</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name *</Label>
                   <Input
@@ -98,7 +98,7 @@ export function StudentRegistration() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email *</Label>
                   <Input
@@ -120,7 +120,7 @@ export function StudentRegistration() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="session">Session *</Label>
                   <Select
@@ -155,7 +155,7 @@ export function StudentRegistration() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="fatherName">Father's Name</Label>
                   <Input
@@ -194,11 +194,11 @@ export function StudentRegistration() {
                 />
               </div>
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+            <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="w-full sm:w-auto">
                 Cancel
               </Button>
-              <Button onClick={handleAddStudent}>Register</Button>
+              <Button onClick={handleAddStudent} className="w-full sm:w-auto">Register</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -212,35 +212,37 @@ export function StudentRegistration() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Roll Number</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Class</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {centerStudents.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell className="font-mono">{student.rollNumber}</TableCell>
-                  <TableCell>{student.name}</TableCell>
-                  <TableCell>{student.email}</TableCell>
-                  <TableCell>{student.phone}</TableCell>
-                  <TableCell>{student.class}</TableCell>
-                </TableRow>
-              ))}
-              {centerStudents.length === 0 && (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No students registered yet
-                  </TableCell>
+                  <TableHead>Roll Number</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Class</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {centerStudents.map((student) => (
+                  <TableRow key={student.id}>
+                    <TableCell className="font-mono">{student.rollNumber}</TableCell>
+                    <TableCell>{student.name}</TableCell>
+                    <TableCell>{student.email}</TableCell>
+                    <TableCell>{student.phone}</TableCell>
+                    <TableCell>{student.class}</TableCell>
+                  </TableRow>
+                ))}
+                {centerStudents.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                      No students registered yet
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

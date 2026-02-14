@@ -13,6 +13,20 @@ import type {
   Result,
   Certificate
 } from '../types';
+import {
+  AuthService,
+  CenterService,
+  StudentService,
+  MarksService,
+  PaymentService,
+  SessionService,
+  ClassService,
+  SubjectService,
+  FeeStructureService,
+  TimetableService,
+  ResultService,
+  CertificateService
+} from '../services/api';
 
 interface DataContextType {
   currentUser: User | null;
@@ -72,7 +86,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
-// Initial mock data
+// Initial mock data (fallback when API is not available)
 const initialUsers: User[] = [
   {
     id: '1',
@@ -206,123 +220,99 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [results, setResults] = useState<Result[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
 
-  // Load data from localStorage on mount
+  // Load data from API on mount
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) setCurrentUser(JSON.parse(savedUser));
-    
-    const savedUsers = localStorage.getItem('users');
-    setUsers(savedUsers ? JSON.parse(savedUsers) : initialUsers);
-    
-    const savedCenters = localStorage.getItem('centers');
-    setCenters(savedCenters ? JSON.parse(savedCenters) : initialCenters);
-    
-    const savedSessions = localStorage.getItem('sessions');
-    setSessions(savedSessions ? JSON.parse(savedSessions) : initialSessions);
-    
-    const savedClasses = localStorage.getItem('classes');
-    setClasses(savedClasses ? JSON.parse(savedClasses) : initialClasses);
-    
-    const savedSubjects = localStorage.getItem('subjects');
-    setSubjects(savedSubjects ? JSON.parse(savedSubjects) : initialSubjects);
-    
-    const savedFees = localStorage.getItem('feeStructures');
-    setFeeStructures(savedFees ? JSON.parse(savedFees) : initialFeeStructures);
-    
-    const savedStudents = localStorage.getItem('students');
-    setStudents(savedStudents ? JSON.parse(savedStudents) : initialStudents);
-    
-    const savedMarks = localStorage.getItem('marks');
-    setMarks(savedMarks ? JSON.parse(savedMarks) : []);
-    
-    const savedPayments = localStorage.getItem('payments');
-    setPayments(savedPayments ? JSON.parse(savedPayments) : initialPayments);
-    
-    const savedTimetables = localStorage.getItem('timetables');
-    setTimetables(savedTimetables ? JSON.parse(savedTimetables) : []);
-    
-    const savedResults = localStorage.getItem('results');
-    setResults(savedResults ? JSON.parse(savedResults) : []);
-    
-    const savedCertificates = localStorage.getItem('certificates');
-    setCertificates(savedCertificates ? JSON.parse(savedCertificates) : []);
+    const loadData = async () => {
+      try {
+        // Check authentication
+        const user = await AuthService.getCurrentUser();
+        if (user) {
+          setCurrentUser(user);
+        }
+
+        // Load all data from API
+        const [centersData, sessionsData, classesData, subjectsData, 
+               feeStructuresData, studentsData, marksData, paymentsData, 
+               timetablesData, resultsData, certificatesData] = await Promise.all([
+          CenterService.getAll(),
+          SessionService.getAll(),
+          ClassService.getAll(),
+          SubjectService.getAll(),
+          FeeStructureService.getAll(),
+          StudentService.getAll(),
+          MarksService.getAll(),
+          PaymentService.getAll(),
+          TimetableService.getAll(),
+          ResultService.getAll(),
+          CertificateService.getAll(),
+        ]);
+
+        setCenters(centersData.data || []);
+        setSessions(sessionsData.data || []);
+        setClasses(classesData.data || []);
+        setSubjects(subjectsData.data || []);
+        setFeeStructures(feeStructuresData.data || []);
+        setStudents(studentsData.data || []);
+        setMarks(marksData.data || []);
+        setPayments(paymentsData.data || []);
+        setTimetables(timetablesData.data || []);
+        setResults(resultsData.data || []);
+        setCertificates(certificatesData.data || []);
+      } catch (error) {
+        console.error('Failed to load data:', error);
+        // Fallback to initial data if API fails
+        setCenters(initialCenters);
+        setSessions(initialSessions);
+        setClasses(initialClasses);
+        setSubjects(initialSubjects);
+        setFeeStructures(initialFeeStructures);
+        setStudents(initialStudents);
+        setPayments(initialPayments);
+      }
+    };
+
+    loadData();
   }, []);
 
-  // Save data to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('users', JSON.stringify(users));
-  }, [users]);
-
-  useEffect(() => {
-    localStorage.setItem('centers', JSON.stringify(centers));
-  }, [centers]);
-
-  useEffect(() => {
-    localStorage.setItem('sessions', JSON.stringify(sessions));
-  }, [sessions]);
-
-  useEffect(() => {
-    localStorage.setItem('classes', JSON.stringify(classes));
-  }, [classes]);
-
-  useEffect(() => {
-    localStorage.setItem('subjects', JSON.stringify(subjects));
-  }, [subjects]);
-
-  useEffect(() => {
-    localStorage.setItem('feeStructures', JSON.stringify(feeStructures));
-  }, [feeStructures]);
-
-  useEffect(() => {
-    localStorage.setItem('students', JSON.stringify(students));
-  }, [students]);
-
-  useEffect(() => {
-    localStorage.setItem('marks', JSON.stringify(marks));
-  }, [marks]);
-
-  useEffect(() => {
-    localStorage.setItem('payments', JSON.stringify(payments));
-  }, [payments]);
-
-  useEffect(() => {
-    localStorage.setItem('timetables', JSON.stringify(timetables));
-  }, [timetables]);
-
-  useEffect(() => {
-    localStorage.setItem('results', JSON.stringify(results));
-  }, [results]);
-
-  useEffect(() => {
-    localStorage.setItem('certificates', JSON.stringify(certificates));
-  }, [certificates]);
-
-  const login = (email: string, password: string): boolean => {
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await AuthService.login(email, password);
+      setCurrentUser(response.user);
       return true;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
     }
-    return false;
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('currentUser');
+  const logout = async () => {
+    try {
+      await AuthService.logout();
+    } finally {
+      setCurrentUser(null);
+    }
   };
 
-  const addCenter = (center: Omit<Center, 'id' | 'createdAt'>) => {
-    const newCenter: Center = {
-      ...center,
-      id: generateId(),
-      createdAt: new Date().toISOString()
-    };
-    setCenters([...centers, newCenter]);
+  const addCenter = async (center: Omit<Center, 'id' | 'createdAt'>) => {
+    try {
+      const response = await CenterService.create(center);
+      setCenters([...centers, response.data]);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to add center:', error);
+      throw error;
+    }
   };
 
-  const updateCenter = (id: string, updates: Partial<Center>) => {
-    setCenters(centers.map(c => c.id === id ? { ...c, ...updates } : c));
+  const updateCenter = async (id: string, updates: Partial<Center>) => {
+    try {
+      const response = await CenterService.update(id, updates);
+      setCenters(centers.map(c => c.id === id ? response.data : c));
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update center:', error);
+      throw error;
+    }
   };
 
   const addSession = (session: Omit<Session, 'id'>) => {
@@ -345,35 +335,48 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setFeeStructures([...feeStructures, newFee]);
   };
 
-  const addStudent = (student: Omit<Student, 'id' | 'registrationDate'>) => {
-    const newStudent: Student = {
-      ...student,
-      id: generateId(),
-      registrationDate: new Date().toISOString()
-    };
-    setStudents([...students, newStudent]);
+  const addStudent = async (student: Omit<Student, 'id' | 'registrationDate'>) => {
+    try {
+      const response = await StudentService.create(student);
+      setStudents([...students, response.data]);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to add student:', error);
+      throw error;
+    }
   };
 
-  const updateStudent = (id: string, updates: Partial<Student>) => {
-    setStudents(students.map(s => s.id === id ? { ...s, ...updates } : s));
+  const updateStudent = async (id: string, updates: Partial<Student>) => {
+    try {
+      const response = await StudentService.update(id, updates);
+      setStudents(students.map(s => s.id === id ? response.data : s));
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update student:', error);
+      throw error;
+    }
   };
 
-  const addMarks = (mark: Omit<Marks, 'id' | 'enteredAt'>) => {
-    const newMark: Marks = {
-      ...mark,
-      id: generateId(),
-      enteredAt: new Date().toISOString()
-    };
-    setMarks([...marks, newMark]);
+  const addMarks = async (mark: Omit<Marks, 'id' | 'enteredAt'>) => {
+    try {
+      const response = await MarksService.create(mark);
+      setMarks([...marks, response.data]);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to add marks:', error);
+      throw error;
+    }
   };
 
-  const bulkAddMarks = (marksList: Omit<Marks, 'id' | 'enteredAt'>[]) => {
-    const newMarks = marksList.map(mark => ({
-      ...mark,
-      id: generateId(),
-      enteredAt: new Date().toISOString()
-    }));
-    setMarks([...marks, ...newMarks]);
+  const bulkAddMarks = async (marksList: Omit<Marks, 'id' | 'enteredAt'>[]) => {
+    try {
+      const response = await MarksService.bulkCreate(marksList);
+      setMarks([...marks, ...response.data]);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to bulk add marks:', error);
+      throw error;
+    }
   };
 
   const addPayment = (payment: Omit<Payment, 'id'>) => {

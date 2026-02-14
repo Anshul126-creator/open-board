@@ -110,47 +110,49 @@ export function PaymentTracking() {
           <CardTitle>Payment History</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Roll Number</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Payment Date</TableHead>
-                <TableHead>Transaction ID</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {centerPayments.map((payment) => {
-                const student = getStudent(payment.studentId);
-                return (
-                  <TableRow key={payment.id}>
-                    <TableCell>{student?.name || 'Unknown'}</TableCell>
-                    <TableCell className="font-mono">{student?.rollNumber}</TableCell>
-                    <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
-                    <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                    <TableCell>
-                      {payment.paymentDate 
-                        ? new Date(payment.paymentDate).toLocaleDateString()
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {payment.transactionId || '-'}
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student</TableHead>
+                  <TableHead>Roll Number</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Payment Date</TableHead>
+                  <TableHead>Transaction ID</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {centerPayments.map((payment) => {
+                  const student = getStudent(payment.studentId);
+                  return (
+                    <TableRow key={payment.id}>
+                      <TableCell>{student?.name || 'Unknown'}</TableCell>
+                      <TableCell className="font-mono">{student?.rollNumber}</TableCell>
+                      <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
+                      <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                      <TableCell>
+                        {payment.paymentDate 
+                          ? new Date(payment.paymentDate).toLocaleDateString()
+                          : '-'
+                        }
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {payment.transactionId || '-'}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {centerPayments.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      No payment records found
                     </TableCell>
                   </TableRow>
-                );
-              })}
-              {centerPayments.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
-                    No payment records found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useData } from '../contexts/DataContext';
+import { AuthService } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -14,22 +15,25 @@ export function Login() {
   const { login, currentUser } = useData();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (login(email, password)) {
-      const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-      toast.success('Login successful!');
-      
-      // Route based on role
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else if (user.role === 'center') {
-        navigate('/center');
-      } else if (user.role === 'student') {
-        navigate('/student');
+    try {
+      const success = await login(email, password);
+      if (success) {
+        const user = await AuthService.getCurrentUser();
+        toast.success('Login successful!');
+        
+        // Route based on role
+        if (user.role === 'admin') {
+          navigate('/admin');
+        } else if (user.role === 'center') {
+          navigate('/center');
+        } else if (user.role === 'student') {
+          navigate('/student');
+        }
       }
-    } else {
+    } catch (error) {
       toast.error('Invalid credentials');
     }
   };
