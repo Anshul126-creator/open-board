@@ -14,12 +14,14 @@ use App\Http\Controllers\FeeStructureController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\RegisterController;
 
 // Authentication Routes
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::post('register', RegisterController::class);
     Route::get('me', [AuthController::class, 'me'])->middleware('auth:api');
 });
 
@@ -73,4 +75,15 @@ Route::middleware('auth:api')->group(function () {
 // Health check
 Route::get('/health', function () {
     return response()->json(['status' => 'healthy']);
+});
+
+// Frontend API endpoints
+Route::prefix('frontend')->group(function () {
+    Route::get('/config', function () {
+        return response()->json([
+            'app_name' => config('app.name'),
+            'api_version' => '1.0.0',
+            'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+        ]);
+    });
 });
