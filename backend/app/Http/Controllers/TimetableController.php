@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class TimetableController extends Controller
 {
     use ApiResponder;
-{
     /**
      * Get all timetables
      *

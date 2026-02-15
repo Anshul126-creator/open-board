@@ -20,6 +20,7 @@ import { StudentRegistration } from './pages/center/StudentRegistration';
 import { MarksEntry } from './pages/center/MarksEntry';
 import { PaymentTracking } from './pages/center/PaymentTracking';
 import { AdmitCards } from './pages/center/AdmitCards';
+import { AttendanceManagement } from './pages/center/AttendanceManagement';
 
 // Student Pages
 import { StudentProfile } from './pages/student/Profile';
@@ -56,7 +57,8 @@ export const router = createBrowserRouter([
       { path: 'register', Component: StudentRegistration },
       { path: 'marks', Component: MarksEntry },
       { path: 'payments', Component: PaymentTracking },
-      { path: 'admit-cards', Component: AdmitCards }
+      { path: 'admit-cards', Component: AdmitCards },
+      { path: 'attendance', Component: AttendanceManagement }
     ]
   },
   {

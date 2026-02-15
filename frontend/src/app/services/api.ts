@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -155,6 +155,17 @@ export const certificateApi = {
   update: (id: string, data: any) => api.put(`/certificates/${id}`, data),
   delete: (id: string) => api.delete(`/certificates/${id}`),
   download: (id: string) => api.get(`/certificates/download/${id}`, { responseType: 'blob' }),
+};
+
+export const attendanceApi = {
+  getAll: (params: any = {}) => api.get('/attendances', { params }),
+  get: (id: string) => api.get(`/attendances/${id}`),
+  create: (data: any) => api.post('/attendances', data),
+  bulkCreate: (data: any) => api.post('/attendances/bulk', data),
+  update: (id: string, data: any) => api.put(`/attendances/${id}`, data),
+  delete: (id: string) => api.delete(`/attendances/${id}`),
+  getStudentSummary: (studentId: string) => api.get(`/attendances/student/${studentId}/summary`),
+  getClassSummary: (classId: string) => api.get(`/attendances/class/${classId}/summary`),
 };
 
 export const healthCheck = () => api.get('/health');

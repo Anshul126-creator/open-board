@@ -26,6 +26,7 @@ import {
   timetableApi,
   resultApi,
   certificateApi,
+  attendanceApi,
 } from '../services/api';
 
 interface RegisterPayload {
@@ -94,6 +95,15 @@ interface DataContextType {
   // Certificates
   certificates: Certificate[];
   addCertificate: (cert: Omit<Certificate, 'id'>) => Promise<Certificate>;
+
+  // Attendance
+  attendances: Attendance[];
+  addAttendance: (attendance: Omit<Attendance, 'id' | 'createdAt' | 'updatedAt' | 'recorder'>) => Promise<Attendance>;
+  bulkAddAttendances: (attendances: Omit<Attendance, 'id' | 'createdAt' | 'updatedAt' | 'recorder'>[]) => Promise<Attendance[]>;
+  updateAttendance: (id: string, updates: Partial<Attendance>) => Promise<Attendance>;
+  deleteAttendance: (id: string) => Promise<void>;
+  getStudentAttendanceSummary: (studentId: string) => Promise<StudentAttendanceSummary>;
+  getClassAttendanceSummary: (classId: string) => Promise<ClassAttendanceSummary[]>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -115,6 +125,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [timetables, setTimetables] = useState<Timetable[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [attendances, setAttendances] = useState<Attendance[]>([]);
 
   // Initialize - check auth status and load data
   useEffect(() => {
@@ -171,7 +182,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         paymentApi.getAll(),
         timetableApi.getAll(),
         resultApi.getAll(),
-        certificateApi.getAll()
+        certificateApi.getAll(),
+        attendanceApi.getAll()
       ]);
 
       setCenters(centersRes.data);
@@ -185,6 +197,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setTimetables(timetablesRes.data);
       setResults(resultsRes.data);
       setCertificates(certificatesRes.data);
+      setAttendances(attendancesRes.data);
       setError(null);
 
     } catch (err: any) {
@@ -459,6 +472,70 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Attendance operations
+  const addAttendance = async (attendance: Omit<Attendance, 'id' | 'createdAt' | 'updatedAt' | 'recorder'>) => {
+    try {
+      const response = await attendanceApi.create(attendance);
+      setAttendances([...attendances, response.data]);
+      return response.data;
+    } catch (err) {
+      console.error('Failed to add attendance:', err);
+      throw err;
+    }
+  };
+
+  const bulkAddAttendances = async (attendancesList: Omit<Attendance, 'id' | 'createdAt' | 'updatedAt' | 'recorder'>[]) => {
+    try {
+      const response = await attendanceApi.bulkCreate(attendancesList);
+      setAttendances([...attendances, ...response.data]);
+      return response.data;
+    } catch (err) {
+      console.error('Failed to bulk add attendances:', err);
+      throw err;
+    }
+  };
+
+  const updateAttendance = async (id: string, updates: Partial<Attendance>) => {
+    try {
+      const response = await attendanceApi.update(id, updates);
+      setAttendances(attendances.map(a => a.id === id ? response.data : a));
+      return response.data;
+    } catch (err) {
+      console.error('Failed to update attendance:', err);
+      throw err;
+    }
+  };
+
+  const deleteAttendance = async (id: string) => {
+    try {
+      await attendanceApi.delete(id);
+      setAttendances(attendances.filter(a => a.id !== id));
+    } catch (err) {
+      console.error('Failed to delete attendance:', err);
+      throw err;
+    }
+  };
+
+  const getStudentAttendanceSummary = async (studentId: string) => {
+    try {
+      const response = await attendanceApi.getStudentSummary(studentId);
+      return response.data.data;
+    } catch (err) {
+      console.error('Failed to get student attendance summary:', err);
+      throw err;
+    }
+  };
+
+  const getClassAttendanceSummary = async (classId: string) => {
+    try {
+      const response = await attendanceApi.getClassSummary(classId);
+      return response.data.data;
+    } catch (err) {
+      console.error('Failed to get class attendance summary:', err);
+      throw err;
+    }
+  };
+
   // Refresh data
   const refreshData = async () => {
     setLoading(true);
@@ -506,7 +583,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
       results,
       publishResult,
       certificates,
-      addCertificate
+      addCertificate,
+      attendances,
+      addAttendance,
+      bulkAddAttendances,
+      updateAttendance,
+      deleteAttendance,
+      getStudentAttendanceSummary,
+      getClassAttendanceSummary
     }}>
       {children}
     </DataContext.Provider>

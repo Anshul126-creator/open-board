@@ -14,6 +14,7 @@ use App\Http\Controllers\FeeStructureController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\RegisterController;
 
 // Authentication Routes
@@ -70,6 +71,12 @@ Route::middleware('auth:api')->group(function () {
     // Certificate Routes
     Route::apiResource('certificates', CertificateController::class);
     Route::get('certificates/download/{certificate}', [CertificateController::class, 'download']);
+
+    // Attendance Routes
+    Route::apiResource('attendances', AttendanceController::class);
+    Route::post('attendances/bulk', [AttendanceController::class, 'bulkStore']);
+    Route::get('attendances/student/{student}/summary', [AttendanceController::class, 'studentSummary']);
+    Route::get('attendances/class/{class}/summary', [AttendanceController::class, 'classSummary']);
 });
 
 // Health check

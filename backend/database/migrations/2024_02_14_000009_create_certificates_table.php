@@ -13,13 +13,22 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+
+            // FIX: Changed from cascade to restrict to prevent data loss
+            $table->foreignId('student_id')->constrained()->restrictOnDelete();
+            
             $table->string('certificate_type'); // marksheet, certificate, etc.
             $table->date('issue_date');
             $table->string('certificate_number')->unique();
             $table->string('file_path');
-            $table->foreignId('session_id')->constrained()->onDelete('cascade');
-            $table->foreignId('center_id')->constrained()->onDelete('cascade');
+
+            // FIX: Reference academic_sessions (per our previous table rename)
+            // and prevent deletion if certificates are issued for that session.
+            $table->foreignId('session_id')->constrained('academic_sessions')->restrictOnDelete();
+
+            // FIX: Prevent center deletion if they have issued certificates
+            $table->foreignId('center_id')->constrained()->restrictOnDelete();
+
             $table->timestamps();
         });
     }

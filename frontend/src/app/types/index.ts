@@ -120,3 +120,41 @@ export interface Certificate {
   issuedDate: string;
   certificateNumber: string;
 }
+
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
+
+export interface Attendance {
+  id: string;
+  studentId: string;
+  sessionId: string;
+  classId: string;
+  centerId: string;
+  date: string;
+  status: AttendanceStatus;
+  remarks?: string;
+  recordedBy: string;
+  createdAt: string;
+  updatedAt: string;
+  student?: Student;
+  session?: Session;
+  class?: Class;
+  center?: Center;
+  recorder?: User;
+}
+
+export interface AttendanceSummary {
+  status: AttendanceStatus;
+  count: number;
+}
+
+export interface StudentAttendanceSummary {
+  summary: AttendanceSummary[];
+  total: number;
+  studentId: string;
+}
+
+export interface ClassAttendanceSummary {
+  date: string;
+  status: AttendanceStatus;
+  count: number;
+}

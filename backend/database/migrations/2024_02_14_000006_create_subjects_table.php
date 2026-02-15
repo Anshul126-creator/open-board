@@ -15,12 +15,18 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('code')->unique();
-            $table->foreignId('class_id')->constrained()->onDelete('cascade');
-            $table->foreignId('session_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('class_id');
+            $table->unsignedBigInteger('session_id');
             $table->integer('max_marks')->default(100);
             $table->integer('pass_marks')->default(35);
-            $table->foreignId('center_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('center_id');
             $table->timestamps();
+        });
+
+        Schema::table('subjects', function (Blueprint $table) {
+            $table->foreign('class_id')->references('id')->on('classes')->onDelete('cascade');
+            $table->foreign('session_id')->references('id')->on('academic_sessions')->onDelete('cascade');
+            $table->foreign('center_id')->references('id')->on('centers')->onDelete('cascade');
         });
     }
 

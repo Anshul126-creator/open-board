@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('timetables', function (Blueprint $table) {
+        // Renamed from 'sessions' to 'academic_sessions' to avoid Laravel system conflicts
+        Schema::create('academic_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('class_id')->constrained()->onDelete('cascade');
-            $table->foreignId('session_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->string('status')->default('active');
             $table->foreignId('center_id')->constrained()->onDelete('cascade');
-            $table->string('file_path');
-            $table->string('file_name');
-            $table->string('file_type');
-            $table->integer('file_size');
-            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('timetables');
+        // Ensure the drop call matches the new table name
+        Schema::dropIfExists('academic_sessions');
     }
 };

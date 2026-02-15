@@ -11,15 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fee_structures', function (Blueprint $table) {
+        Schema::create('timetables', function (Blueprint $table) {
             $table->id();
             $table->foreignId('class_id')->constrained()->onDelete('cascade');
-            $table->foreignId('session_id')->constrained()->onDelete('cascade');
+            
+            // Reference academic_sessions per previous table rename
+            $table->foreignId('session_id')->constrained('academic_sessions')->onDelete('cascade');
+            
             $table->foreignId('center_id')->constrained()->onDelete('cascade');
-            $table->string('fee_type');
-            $table->decimal('amount', 10, 2);
+            $table->string('file_path');
+            $table->string('file_name');
+            $table->string('file_type');
+
+            // FIX: Changed from integer to unsignedBigInteger to prevent overflow
+            $table->unsignedBigInteger('file_size');
+
             $table->text('description')->nullable();
-            $table->date('due_date')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fee_structures');
+        Schema::dropIfExists('timetables');
     }
 };

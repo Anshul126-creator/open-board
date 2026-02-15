@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // Added this
 
 class FeeStructure extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes; // Added SoftDeletes trait
 
     protected $fillable = [
         'class_id',
@@ -19,32 +20,9 @@ class FeeStructure extends Model
         'due_date',
     ];
 
+    // Optional: Casts for better data handling
     protected $casts = [
         'amount' => 'decimal:2',
         'due_date' => 'date',
     ];
-
-    /**
-     * Define relationship with center.
-     */
-    public function center()
-    {
-        return $this->belongsTo(Center::class);
-    }
-
-    /**
-     * Define relationship with class.
-     */
-    public function class()
-    {
-        return $this->belongsTo(ClassModel::class, 'class_id');
-    }
-
-    /**
-     * Define relationship with session.
-     */
-    public function session()
-    {
-        return $this->belongsTo(Session::class);
-    }
 }

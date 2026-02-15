@@ -5,9 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Session extends Model
+class AcademicSession extends Model
 {
     use HasFactory;
+
+    /**
+     * The table associated with the model.
+     * Since we renamed the table to avoid Laravel system conflicts.
+     */
+    protected $table = 'academic_sessions';
 
     protected $fillable = [
         'name',
@@ -32,10 +38,11 @@ class Session extends Model
 
     /**
      * Define relationship with students.
+     * Note: If Student model uses 'session_id', it works automatically.
      */
     public function students()
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(Student::class, 'session_id');
     }
 
     /**
@@ -43,6 +50,6 @@ class Session extends Model
      */
     public function subjects()
     {
-        return $this->hasMany(Subject::class);
+        return $this->hasMany(Subject::class, 'session_id');
     }
 }
