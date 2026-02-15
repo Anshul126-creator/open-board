@@ -5,7 +5,6 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { GraduationCap } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
@@ -104,12 +103,14 @@ export function Login() {
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="bg-blue-600 p-3 rounded-full">
-              <GraduationCap className="w-8 h-8 text-white" />
-            </div>
+            <img
+              src="/35f50689-ace6-4b61-85bd-30663dba9264.jpeg"
+              alt="Open Board logo"
+              className="h-14 w-14 rounded-full object-cover"
+            />
           </div>
-          <CardTitle className="text-2xl">Education Management System</CardTitle>
-          <CardDescription>Access all panels with a single account</CardDescription>
+          <CardTitle className="text-2xl">Board of Vocational and Skills Higher Secondary Education</CardTitle>
+          <CardDescription>विद्याधनं सर्वधनं प्रधानम्</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'signup')}>

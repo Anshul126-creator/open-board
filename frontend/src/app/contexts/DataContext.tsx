@@ -11,7 +11,10 @@ import type {
   Payment, 
   Timetable, 
   Result,
-  Certificate
+  Certificate,
+  Attendance,
+  ClassAttendanceSummary,
+  StudentAttendanceSummary
 } from '../types';
 import {
   authApi,
